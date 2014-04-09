@@ -21,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bj4.dustcleaner.R;
 
@@ -30,11 +31,11 @@ public class MainFragment extends Fragment {
 
     private static final boolean DEBUG = true;
 
-    private Button mClean;
-
-    private TextView mInfo;
-
-    private Handler mHandler = new Handler();
+    // private Button mClean;
+    //
+    // private TextView mInfo;
+    //
+    // private Handler mHandler = new Handler();
 
     public MainFragment() {
     }
@@ -42,92 +43,100 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        mInfo = (TextView)rootView.findViewById(R.id.info);
-        mClean = (Button)rootView.findViewById(R.id.clean);
-        mClean.setOnClickListener(new OnClickListener() {
+        // mInfo = (TextView)rootView.findViewById(R.id.info);
+        // mClean = (Button)rootView.findViewById(R.id.clean);
+        // mClean.setOnClickListener(new OnClickListener() {
+        //
+        // @Override
+        // public void onClick(View v) {
+        // new Thread(new Runnable() {
+        //
+        // @Override
+        // public void run() {
+        // clean();
+        // }
+        // }).start();
+        // }
+        // });
 
-            @Override
-            public void onClick(View v) {
-                new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        clean();
-                    }
-                }).start();
-            }
-        });
-
+        clean();
+        Toast.makeText(getActivity(), "memory freed", Toast.LENGTH_LONG).show();
+        getActivity().finish();
         return rootView;
     }
 
     public synchronized void clean() {
         ActivityManager am = (ActivityManager)getActivity().getSystemService(
                 Activity.ACTIVITY_SERVICE);
-        String globalInfo = "";
+        // String globalInfo = "";
         List<RunningAppProcessInfo> runningProcessList = am.getRunningAppProcesses();
         List<RunningServiceInfo> runningServiceList = am.getRunningServices(200);
         List<RunningTaskInfo> runningTaskList = am.getRunningTasks(200);
         MemoryInfo memInfo = new MemoryInfo();
         am.getMemoryInfo(memInfo);
-        int totalTask = runningProcessList.size() + runningServiceList.size()
-                + runningTaskList.size();
-        long totalAvailableMemory = memInfo.totalMem / (1024 * 1024);
-        globalInfo += "total task: " + totalTask + ", available memory: " + totalAvailableMemory
-                + "\n";
-        String processInfo = "";
-        String resultInfo = "";
+        // int totalTask = runningProcessList.size() + runningServiceList.size()
+        // + runningTaskList.size();
+        // long totalAvailableMemory = memInfo.totalMem / (1024 * 1024);
+        // globalInfo += "total task: " + totalTask + ", available memory: " +
+        // totalAvailableMemory
+        // + "\n";
+        // String processInfo = "";
+        // String resultInfo = "";
         for (RunningAppProcessInfo info : runningProcessList) {
             android.os.Debug.MemoryInfo[] mii = am.getProcessMemoryInfo(new int[] {
                 info.pid
             });
-            processInfo = "package: " + info.processName + ", \nprocess memory: "
-                    + mii[0].getTotalPss();
+            // processInfo = "package: " + info.processName +
+            // ", \nprocess memory: "
+            // + mii[0].getTotalPss();
             am.killBackgroundProcesses(info.processName);
             am.getMemoryInfo(memInfo);
-            resultInfo = "\nAvaliable size: " + (memInfo.availMem / (1024 * 1024));
-            final String result = globalInfo + processInfo + resultInfo;
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    mInfo.setText(result);
-                }
-            });
+            // resultInfo = "\nAvaliable size: " + (memInfo.availMem / (1024 *
+            // 1024));
+            // final String result = globalInfo + processInfo + resultInfo;
+            // mHandler.post(new Runnable() {
+            //
+            // @Override
+            // public void run() {
+            // mInfo.setText(result);
+            // }
+            // });
         }
 
         for (RunningServiceInfo info : runningServiceList) {
             android.os.Debug.MemoryInfo[] mii = am.getProcessMemoryInfo(new int[] {
                 info.pid
             });
-            processInfo = "package: " + info.process + ", \nprocess memory: "
-                    + mii[0].getTotalPss();
+            // processInfo = "package: " + info.process + ", \nprocess memory: "
+            // + mii[0].getTotalPss();
             am.getMemoryInfo(memInfo);
             am.killBackgroundProcesses(info.process);
-            resultInfo = "\nAvaliable size: " + (memInfo.availMem / (1024 * 1024));
-            final String result = globalInfo + processInfo + resultInfo;
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    mInfo.setText(result);
-                }
-            });
+            // resultInfo = "\nAvaliable size: " + (memInfo.availMem / (1024 *
+            // 1024));
+            // final String result = globalInfo + processInfo + resultInfo;
+            // mHandler.post(new Runnable() {
+            //
+            // @Override
+            // public void run() {
+            // mInfo.setText(result);
+            // }
+            // });
         }
 
         for (RunningTaskInfo info : runningTaskList) {
-            processInfo = "package: " + info.topActivity.getPackageName();
+            // processInfo = "package: " + info.topActivity.getPackageName();
             am.getMemoryInfo(memInfo);
             am.killBackgroundProcesses(info.topActivity.getPackageName());
-            resultInfo = "\nAvaliable size: " + (memInfo.availMem / (1024 * 1024));
-            final String result = globalInfo + processInfo + resultInfo;
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    mInfo.setText(result);
-                }
-            });
+            // resultInfo = "\nAvaliable size: " + (memInfo.availMem / (1024 *
+            // 1024));
+            // final String result = globalInfo + processInfo + resultInfo;
+            // mHandler.post(new Runnable() {
+            //
+            // @Override
+            // public void run() {
+            // mInfo.setText(result);
+            // }
+            // });
         }
     }
 }
